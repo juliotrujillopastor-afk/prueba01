@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio de Ecuaciones Exponenciales</title>
+    
+    <!-- Tailwind CSS para diseño moderno y responsivo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter y JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- KaTeX para renderizado matemático de alta calidad -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-500 selection:text-white min-h-screen flex flex-col">
+
+    <!-- Barra de Navegación Superior -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo y Título -->
+                <div class="flex items-center gap-3">
+                    <div class="bg-brand-600 text-white p-2 rounded-xl shadow-md shadow-brand-500/20">
+                        <i data-lucide="trending-up" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight leading-none">ExpoLab</h1>
+                        <p class="text-xs text-slate-500 font-medium hidden sm:block">Ecuaciones Exponenciales Interactivas</p>
+                    </div>
+                </div>
+
+                <!-- Navegación Desktop -->
+                <nav class="hidden md:flex space-x-1 bg-slate-100 p-1 rounded-xl" aria-label="Secciones">
+                    <button onclick="switchTab('teoria')" id="nav-teoria" class="tab-btn active-tab flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-white text-brand-600 shadow-sm">
+                        <i data-lucide="book-open" class="w-4 h-4"></i> Teoría
+                    </button>
+                    <button onclick="switchTab('ejemplos')" id="nav-ejemplos" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 transition-all duration-200">
+                        <i data-lucide="layers" class="w-4 h-4"></i> Ejemplos Paso a Paso
+                    </button>
+                    <button onclick="switchTab('practica')" id="nav-practica" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 transition-all duration-200">
+                        <i data-lucide="pen-tool" class="w-4 h-4"></i> Práctica
+                    </button>
+                    <button onclick="switchTab('solucionador')" id="nav-solucionador" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 transition-all duration-200">
+                        <i data-lucide="calculator" class="w-4 h-4"></i> Solucionador Gráfico
+                    </button>
+                </nav>
+
+                <!-- Indicador de Progreso en Práctica -->
+                <div class="flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full">
+                    <i data-lucide="award" class="w-4 h-4 text-emerald-600"></i>
+                    <span class="text-xs font-bold text-emerald-800">Aciertos: <span id="score-counter">0</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navegación Móvil (Horizontal Scrollable) -->
+        <div class="md:hidden border-t border-slate-100 bg-slate-50/80 backdrop-blur px-2 py-2 overflow-x-auto flex gap-1.5">
+            <button onclick="switchTab('teoria')" id="mob-teoria" class="mob-tab-btn flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-brand-600 text-white shadow-sm">
+                <i data-lucide="book-open" class="w-3.5 h-3.5"></i> Teoría
+            </button>
+            <button onclick="switchTab('ejemplos')" id="mob-ejemplos" class="mob-tab-btn flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-white text-slate-600 border border-slate-200">
+                <i data-lucide="layers" class="w-3.5 h-3.5"></i> Ejemplos
+            </button>
+            <button onclick="switchTab('practica')" id="mob-practica" class="mob-tab-btn flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-white text-slate-600 border border-slate-200">
+                <i data-lucide="pen-tool" class="w-3.5 h-3.5"></i> Práctica
+            </button>
+            <button onclick="switchTab('solucionador')" id="mob-solucionador" class="mob-tab-btn flex-shrink-0 flex-center flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-white text-slate-600 border border-slate-200">
+                <i data-lucide="calculator" class="w-3.5 h-3.5"></i> Solucionador
+            </button>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+
+        <!-- ========================================================= -->
+        <!-- SECCIÓN 1: TEORÍA                                         -->
+        <!-- ========================================================= -->
+        <section id="sec-teoria" class="tab-section space-y-8">
+            <!-- Hero Card -->
+            <div class="bg-gradient-to-br from-brand-700 via-brand-600 to-indigo-800 rounded-2xl p-6 sm:p-10 text-white shadow-xl relative overflow-hidden">
+                <div class="relative z-10 max-w-3xl">
+                    <span class="inline-block px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-semibold uppercase tracking-wider mb-3">Fundamentos Matemáticos</span>
+                    <h2 class="text-2xl sm:text-4xl font-bold mb-4">¿Qué es una Ecuación Exponencial?</h2>
+                    <p class="text-brand-100 text-base sm:text-lg leading-relaxed mb-6">
+                        Una <strong>ecuación exponencial</strong> es aquella en la que la incógnita (generalmente $x$) aparece únicamente en los <strong>exponentes</strong> de potencias con bases constantes positivas y distintas de 1.
+                    </p>
+                    <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4 inline-block">
+                        <p class="text-sm text-brand-100 mb-1">Forma canónica básica:</p>
+                        <div class="text-xl sm:text-2xl font-bold">$$a^{f(x)} = b \quad \text{con } a > 0, \; a \neq 1$$</div>
+                    </div>
+                </div>
+                <!-- Decoración geométrica -->
+                <div class="hidden lg:block absolute -right-10 -bottom-10 opacity-15 pointer-events-none">
+                    <svg width="320" height="320" viewBox="0 0 200 200" fill="none">
+                        <path d="M10 180 Q 120 175 180 10" stroke="white" stroke-width="12" stroke-linecap="round"/>
+                        <circle cx="145" cy="95" r="10" fill="white"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Propiedades de las Potencias y Logaritmos -->
+            <div>
+                <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <i data-lucide="key" class="w-5 h-5 text-brand-600"></i> Herramientas Esenciales (Propiedades)
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                        <span class="text-xs font-bold text-brand-600 uppercase">Producto de igual base</span>
+                        <div class="my-3 text-lg text-center bg-slate-50 py-2.5 rounded-xl border border-slate-100">$$a^m \cdot a^n = a^{m+n}$$</div>
+                        <p class="text-xs text-slate-600">Útil para descomponer sumas en el exponente: $2^{x+3} = 2^x \cdot 2^3 = 8 \cdot 2^x$.</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                        <span class="text-xs font-bold text-brand-600 uppercase">Cociente de igual base</span>
+                        <div class="my-3 text-lg text-center bg-slate-50 py-2.5 rounded-xl border border-slate-100">$$\frac{a^m}{a^n} = a^{m-n}$$</div>
+                        <p class="text-xs text-slate-600">Permite reescribir restas en el exponente: $3^{x-1} = \frac{3^x}{3}$.</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                        <span class="text-xs font-bold text-brand-600 uppercase">Potencia de una potencia</span>
+                        <div class="my-3 text-lg text-center bg-slate-50 py-2.5 rounded-xl border border-slate-100">$$(a^m)^n = a^{m \cdot n}$$</div>
+                        <p class="text-xs text-slate-600">Clave para cambios de variable: $4^x = (2^2)^x = (2^x)^2$.</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                        <span class="text-xs font-bold text-emerald-600 uppercase">Exponente Negativo y Cero</span>
+                        <div class="my-3 text-lg text-center bg-slate-50 py-2.5 rounded-xl border border-slate-100">$$a^{-n} = \frac{1}{a^n}, \quad a^0 = 1$$</div>
+                        <p class="text-xs text-slate-600">Transforma fracciones en potencias enteras: $\frac{1}{9} = 3^{-2}$.</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                        <span class="text-xs font-bold text-emerald-600 uppercase">Exponente Fraccionario</span>
+                        <div class="my-3 text-lg text-center bg-slate-50 py-2.5 rounded-xl border border-slate-100">$$\sqrt[n]{a^m} = a^{\frac{m}{n}}$$</div>
+                        <p class="text-xs text-slate-600">Convierte radicales en potencias: $\sqrt{5} = 5^{1/2}$.</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                        <span class="text-xs font-bold text-purple-600 uppercase">Propiedad del Logaritmo</span>
+                        <div class="my-3 text-lg text-center bg-slate-50 py-2.5 rounded-xl border border-slate-100">$$\ln(a^x) = x \cdot \ln(a)$$</div>
+                        <p class="text-xs text-slate-600">Permite "bajar" la incógnita del exponente cuando las bases no coinciden.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Los 3 Métodos de Resolución -->
+            <div>
+                <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <i data-lucide="compass" class="w-5 h-5 text-brand-600"></i> Los 3 Métodos Principales de Resolución
+                </h3>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Método 1 -->
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm flex flex-col">
+                        <div class="bg-blue-50 border-b border-blue-100 p-5">
+                            <span class="px-2.5 py-1 bg-blue-600 text-white text-xs font-bold rounded-lg">Caso 1</span>
+                            <h4 class="text-lg font-bold text-slate-900 mt-2">Igualación de Bases</h4>
+                            <p class="text-xs text-slate-600 mt-1">Cuando ambos lados pueden escribirse como potencias de la misma base.</p>
+                        </div>
+                        <div class="p-5 flex-grow space-y-3 text-sm text-slate-700">
+                            <p>Si $a > 0$ y $a \neq 1$, la función exponencial es inyectiva, por lo tanto:</p>
+                            <div class="bg-slate-50 p-3 rounded-xl text-center font-semibold border border-slate-100">
+                                $$a^{f(x)} = a^{g(x)} \iff f(x) = g(x)$$
+                            </div>
+                            <p class="text-xs text-slate-500"><strong>Ejemplo rápido:</strong> $2^{x+1} = 8 \implies 2^{x+1} = 2^3 \implies x+1 = 3 \implies x = 2$.</p>
+                        </div>
+                    </div>
+
+                    <!-- Método 2 -->
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm flex flex-col">
+                        <div class="bg-purple-50 border-b border-purple-100 p-5">
+                            <span class="px-2.5 py-1 bg-purple-600 text-white text-xs font-bold rounded-lg">Caso 2</span>
+                            <h4 class="text-lg font-bold text-slate-900 mt-2">Uso de Logaritmos</h4>
+                            <p class="text-xs text-slate-600 mt-1">Cuando las bases no comparten un factor común entero sencillo.</p>
+                        </div>
+                        <div class="p-5 flex-grow space-y-3 text-sm text-slate-700">
+                            <p>Aplicamos logaritmo ($\log$ o $\ln$) a ambos miembros para despejar el exponente:</p>
+                            <div class="bg-slate-50 p-3 rounded-xl text-center font-semibold border border-slate-100">
+                                $$a^x = b \iff x = \frac{\ln(b)}{\ln(a)}$$
+                            </div>
+                            <p class="text-xs text-slate-500"><strong>Nota vital:</strong> Solo existe solución real si el término independiente $b > 0$.</p>
+                        </div>
+                    </div>
+
+                    <!-- Método 3 -->
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm flex flex-col">
+                        <div class="bg-amber-50 border-b border-amber-100 p-5">
+                            <span class="px-2.5 py-1 bg-amber-600 text-white text-xs font-bold rounded-lg">Caso 3</span>
+                            <h4 class="text-lg font-bold text-slate-900 mt-2">Cambio de Variable</h4>
+                            <p class="text-xs text-slate-600 mt-1">Cuando aparecen sumas o restas de potencias con la misma base.</p>
+                        </div>
+                        <div class="p-5 flex-grow space-y-3 text-sm text-slate-700">
+                            <p>Sustituimos la potencia exponencial por una variable auxiliar $t$:</p>
+                            <div class="bg-slate-50 p-3 rounded-xl text-center font-semibold border border-slate-100">
+                                $$t = a^x \quad (\text{con } t > 0)$$
+                            </div>
+                            <p class="text-xs text-slate-500">Resolvemos la ecuación algebraica (lineal o cuadrática) en $t$ y luego deshacemos el cambio.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Call to action hacia ejemplos -->
+            <div class="bg-slate-900 text-white rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div>
+                    <h4 class="text-lg font-bold">¿Listo para ver la teoría en acción?</h4>
+                    <p class="text-sm text-slate-300">Explora nuestros ejercicios resueltos paso a paso clasificados por dificultad.</p>
+                </div>
+                <button onclick="switchTab('ejemplos')" class="w-full sm:w-auto px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 shadow-lg">
+                    Ir a Ejemplos Resueltos <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- SECCIÓN 2: EJEMPLOS Y ACTIVIDADES RESUELTAS PASO A PASO   -->
+        <!-- ========================================================= -->
+        <section id="sec-ejemplos" class="tab-section hidden space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Actividades Resueltas Paso a Paso</h2>
+                    <p class="text-sm text-slate-600 mt-1">Haz clic en <strong>"Siguiente paso"</strong> para razonar cada transformación antes de ver la respuesta.</p>
+                </div>
+                <!-- Filtros de Nivel -->
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="filterExamples('todos')" class="ex-filter-btn active px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white transition">Todos</button>
+                    <button onclick="filterExamples('basico')" class="ex-filter-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition">Básico</button>
+                    <button onclick="filterExamples('intermedio')" class="ex-filter-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 hover:bg-amber-100 transition">Intermedio</button>
+                    <button onclick="filterExamples('avanzado')" class="ex-filter-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-rose-50 text-rose-700 hover:bg-rose-100 transition">Avanzado</button>
+                </div>
+            </div>
+
+            <!-- Contenedor Dinámico de Tarjetas de Ejemplos -->
+            <div id="examples-container" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Se renderiza vía JavaScript -->
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- SECCIÓN 3: PRÁCTICA INTERACTIVA                           -->
+        <!-- ========================================================= -->
+        <section id="sec-practica" class="tab-section hidden space-y-6">
+            <div class="max-w-3xl mx-auto space-y-6">
+                <!-- Controles Superiores de Práctica -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">Entrenamiento Interactivo</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Selecciona el nivel y genera ecuaciones ilimitadas para practicar.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <select id="practice-level" onchange="generateNewProblem()" class="bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl px-3 py-2.5 font-medium focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            <option value="basico">Nivel Básico (Bases iguales)</option>
+                            <option value="intermedio">Nivel Intermedio (Lineal / Logaritmos)</option>
+                            <option value="avanzado">Nivel Avanzado (Cambio de variable)</option>
+                        </select>
+                        <button onclick="generateNewProblem()" class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-xl transition flex items-center gap-2">
+                            <i data-lucide="refresh-cw" class="w-4 h-4"></i> Nuevo
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tarjeta del Ejercicio Actual -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-md overflow-hidden">
+                    <div class="bg-slate-50 border-b border-slate-200 px-6 py-4 flex justify-between items-center">
+                        <span id="prob-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">Nivel Básico</span>
+                        <span id="prob-type" class="text-xs font-medium text-slate-500">Igualación de bases</span>
+                    </div>
+
+                    <div class="p-6 sm:p-8 text-center space-y-6">
+                        <p class="text-sm font-medium text-slate-500 uppercase tracking-wider">Resuelve para $x$:</p>
+                        
+                        <!-- Ecuación a resolver -->
+                        <div id="prob-equation" class="text-2xl sm:text-4xl font-bold text-slate-900 py-4 px-4 bg-brand-50/50 rounded-2xl border border-brand-100 overflow-x-auto">
+                            $$2^{x+1} = 16$$
+                        </div>
+
+                        <!-- Formulario de Respuesta -->
+                        <div class="max-w-md mx-auto space-y-3">
+                            <label for="user-answer" class="block text-xs text-slate-500 text-left">
+                                Introduce tu resultado (ej. <code class="bg-slate-100 px-1 rounded">3</code>, <code class="bg-slate-100 px-1 rounded">-1/2</code>, <code class="bg-slate-100 px-1 rounded">1.58</code> o <code class="bg-slate-100 px-1 rounded">ln(5)/ln(2)</code>):
+                            </label>
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <div class="relative flex-grow">
+                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 font-mono font-bold">x =</span>
+                                    <input type="text" id="user-answer" placeholder="Tu respuesta..." onkeydown="if(event.key==='Enter') checkAnswer()"
+                                        class="w-full pl-11 pr-4 py-3 bg-white border-2 border-slate-200 rounded-xl font-mono text-base text-slate-900 focus:border-brand-500 focus:outline-none transition">
+                                </div>
+                                <button onclick="checkAnswer()" class="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow-md shadow-brand-500/20 transition flex items-center justify-center gap-2">
+                                    <i data-lucide="check-circle" class="w-4 h-4"></i> Comprobar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Caja de Retroalimentación (Oculta por defecto) -->
+                        <div id="practice-feedback" class="hidden max-w-lg mx-auto p-4 rounded-xl text-sm font-medium text-left"></div>
+
+                        <!-- Botón de Ayuda / Solución -->
+                        <div class="pt-2 border-t border-slate-100 flex justify-center gap-4">
+                            <button onclick="togglePracticeSolution()" id="btn-show-sol" class="text-xs font-semibold text-slate-500 hover:text-brand-600 flex items-center gap-1.5 py-2 px-3 rounded-lg hover:bg-slate-50 transition">
+                                <i data-lucide="help-circle" class="w-4 h-4"></i> ¿Atascado? Ver solución paso a paso
+                            </button>
+                        </div>
+
+                        <!-- Contenedor de Solución Detallada -->
+                        <div id="practice-solution-box" class="hidden text-left bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-3">
+                            <h4 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                                <i data-lucide="lightbulb" class="w-4 h-4 text-amber-500"></i> Resolución Detallada:
+                            </h4>
+                            <div id="practice-steps-list" class="space-y-2.5 text-sm text-slate-700"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- SECCIÓN 4: SOLUCIONADOR Y GRÁFICA INTERACTIVA             -->
+        <!-- ========================================================= -->
+        <section id="sec-solucionador" class="tab-section hidden space-y-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <h2 class="text-2xl font-bold text-slate-900">Solucionador y Visualizador Gráfico</h2>
+                <p class="text-sm text-slate-600 mt-1">
+                    Introduce los parámetros de una ecuación exponencial de la forma $k \cdot a^{m x + n} = c$, obtén su resolución algebraica paso a paso y visualiza el punto de corte entre $f(x) = k \cdot a^{mx+n}$ y $g(x) = c$.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Panel Izquierdo: Controles y Pasos -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+                        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                            <i data-lucide="sliders" class="w-4 h-4 text-brand-600"></i> Parámetros de la Ecuación
+                        </h3>
+                        
+                        <div class="bg-slate-900 text-white p-4 rounded-xl text-center text-lg font-mono">
+                            <span id="solver-preview-eq">$$1 \cdot 2^{1x + 0} = 8$$</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Coeficiente ($k$)</label>
+                                <input type="number" id="sol-k" value="1" step="any" oninput="solveCustomEquation()" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Base ($a > 0, a \neq 1$)</label>
+                                <input type="number" id="sol-a" value="2" step="any" oninput="solveCustomEquation()" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Pendiente exp. ($m$)</label>
+                                <input type="number" id="sol-m" value="1" step="any" oninput="solveCustomEquation()" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Desplazamiento ($n$)</label>
+                                <input type="number" id="sol-n" value="0" step="any" oninput="solveCustomEquation()" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Resultado / Constante ($c$)</label>
+                                <input type="number" id="sol-c" value="8" step="any" oninput="solveCustomEquation()" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                        </div>
+
+                        <!-- Botones de Presets rápidos -->
+                        <div class="pt-2 border-t border-slate-100">
+                            <span class="block text-xs font-semibold text-slate-400 mb-2">Ejemplos rápidos:</span>
+                            <div class="flex flex-wrap gap-1.5">
+                                <button onclick="setSolverPreset(1, 2, 1, 0, 8)" class="px-2.5 py-1 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg font-mono">2^x = 8</button>
+                                <button onclick="setSolverPreset(3, 2, 1, -1, 12)" class="px-2.5 py-1 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg font-mono">3·2^(x-1) = 12</button>
+                                <button onclick="setSolverPreset(1, 5, 2, 1, 10)" class="px-2.5 py-1 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg font-mono">5^(2x+1) = 10</button>
+                                <button onclick="setSolverPreset(1, 0.5, 1, 0, 4)" class="px-2.5 py-1 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg font-mono">(0.5)^x = 4</button>
+                                <button onclick="setSolverPreset(1, 3, 1, 0, -2)" class="px-2.5 py-1 text-xs bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-lg font-mono">3^x = -2 (Sin sol.)</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Desglose Paso a Paso del Solucionador -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                            <i data-lucide="list-ordered" class="w-4 h-4 text-brand-600"></i> Procedimiento Algebraico
+                        </h3>
+                        <div id="solver-steps" class="space-y-3 text-sm text-slate-700">
+                            <!-- Generado dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel Derecho: Gráfica Interactiva en Canvas -->
+                <div class="lg:col-span-7 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-900">Interpretación Geométrica</h3>
+                            <p class="text-xs text-slate-500">La solución $x$ es la abscisa donde se intersecan ambas curvas.</p>
+                        </div>
+                        <div class="flex items-center gap-4 text-xs font-medium">
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-brand-600 inline-block"></span> $f(x) = k \cdot a^{mx+n}$</span>
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span> $g(x) = c$</span>
+                        </div>
+                    </div>
+                    
+                    <div class="relative flex-grow w-full min-h-[340px] sm:min-h-[420px] bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
+                        <canvas id="graph-canvas" class="w-full h-full block"></canvas>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-3 text-center">
+                        El plano cartesiano ajusta automáticamente su escala para centrar la intersección cuando existe solución real.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-slate-500">
+            <p><strong>ExpoLab</strong> — Recurso Educativo Interactivo para Álgebra y Funciones.</p>
+            <p>Renderizado matemático con KaTeX • Gráficas en HTML5 Canvas</p>
+        </div>
+    </footer>
+
+    <!-- ========================================================= -->
+    <!-- LÓGICA JAVASCRIPT DE LA APLICACIÓN                        -->
+    <!-- ========================================================= -->
+    <script>
+        // ==========================================
+        // 1. UTILIDAD PARA RENDERIZADO CON KATEX
+        // ==========================================
+        function renderMath(element = document.body) {
+            if (typeof renderMathInElement === 'function') {
+                renderMathInElement(element, {
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false }
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+
+        // ==========================================
+        // 2. NAVEGACIÓN POR PESTAÑAS
+        // ==========================================
+        function switchTab(tabId) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.tab-section').forEach(sec => sec.classList.add('hidden'));
+            
+            // Mostrar la sección activa
+            const target = document.getElementById('sec-' + tabId);
+            if (target) {
+                target.classList.remove('hidden');
+                renderMath(target);
+            }
+
+            // Actualizar estilos de botones Desktop
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-white', 'text-brand-600', 'shadow-sm', 'font-semibold');
+                btn.classList.add('text-slate-600', 'font-medium');
+            });
+            const activeDesk = document.getElementById('nav-' + tabId);
+            if (activeDesk) {
+                activeDesk.classList.add('bg-white', 'text-brand-600', 'shadow-sm', 'font-semibold');
+                activeDesk.classList.remove('text-slate-600', 'font-medium');
+            }
+
+            // Actualizar estilos de botones Móvil
+            document.querySelectorAll('.mob-tab-btn').forEach(btn => {
+                btn.classList.remove('bg-brand-600', 'text-white', 'shadow-sm', 'font-semibold');
+                btn.classList.add('bg-white', 'text-slate-600', 'border', 'border-slate-200', 'font-medium');
+            });
+            const activeMob = document.getElementById('mob-' + tabId);
+            if (activeMob) {
+                activeMob.classList.add('bg-brand-600', 'text-white', 'shadow-sm', 'font-semibold');
+                activeMob.classList.remove('bg-white', 'text-slate-600', 'border', 'border-slate-200', 'font-medium');
+            }
+
+            // Si entramos al solucionador, redibujar el canvas con dimensiones reales
+            if (tabId === 'solucionador') {
+                setTimeout(() => {
+                    solveCustomEquation();
+                }, 50);
+            }
+        }
+
+        // ==========================================
+        // 3. DATOS Y LÓGICA DE EJEMPLOS PASO A PASO
+        // ==========================================
+        const EXAMPLES_DATA = [
+            {
+                id: 'ex1',
+                level: 'basico',
+                levelLabel: 'Básico',
+                method: 'Igualación de bases',
+                equation: '3^{2x - 1} = 27',
+                steps: [
+                    { text: 'Descomponemos el número $27$ en factores primos para expresar ambos miembros con la misma base ($3$).', math: '27 = 3^3 \\implies 3^{2x - 1} = 3^3' },
+                    { text: 'Como las bases son iguales ($3 > 0, 3 \\neq 1$), igualamos directamente los exponentes.', math: '2x - 1 = 3' },
+                    { text: 'Resolvemos la ecuación lineal resultante despejando $x$.', math: '2x = 4 \\implies x = 2' }
+                ]
+            },
+            {
+                id: 'ex2',
+                level: 'basico',
+                levelLabel: 'Básico',
+                method: 'Exponentes fraccionarios y negativos',
+                equation: '2^{3x + 2} = \\frac{1}{\\sqrt{2}}',
+                steps: [
+                    { text: 'Expresamos la raíz cuadrada como exponente fraccionario: $\\sqrt{2} = 2^{1/2}$.', math: '2^{3x + 2} = \\frac{1}{2^{1/2}}' },
+                    { text: 'Aplicamos la propiedad del exponente negativo $\\frac{1}{a^n} = a^{-n}$ en el lado derecho.', math: '2^{3x + 2} = 2^{-1/2}' },
+                    { text: 'Igualamos los exponentes y resolvemos la ecuación de primer grado.', math: '3x + 2 = -\\frac{1}{2} \\implies 3x = -\\frac{5}{2} \\implies x = -\\frac{5}{6}' }
+                ]
+            },
+            {
+                id: 'ex3',
+                level: 'intermedio',
+                levelLabel: 'Intermedio',
+                method: 'Uso de logaritmos',
+                equation: '5^{x + 1} = 18',
+                steps: [
+                    { text: 'Como $18$ no es una potencia exacta de $5$, aplicamos logaritmo natural ($\\ln$) a ambos lados.', math: '\\ln(5^{x + 1}) = \\ln(18)' },
+                    { text: 'Usamos la propiedad $\\ln(a^b) = b \\cdot \\ln(a)$ para bajar el exponente.', math: '(x + 1) \\cdot \\ln(5) = \\ln(18)' },
+                    { text: 'Dividimos entre $\\ln(5)$ y restamos $1$ para aislar $x$.', math: 'x + 1 = \\frac{\\ln(18)}{\\ln(5)} \\implies x = \\frac{\\ln(18)}{\\ln(5)} - 1 \\approx 0.7959' }
+                ]
+            },
+            {
+                id: 'ex4',
+                level: 'intermedio',
+                levelLabel: 'Intermedio',
+                method: 'Factor común en potencias',
+                equation: '2^{x+1} + 2^x + 2^{x-1} = 28',
+                steps: [
+                    { text: 'Separamos las sumas y restas de los exponentes usando $a^{m+n} = a^m \\cdot a^n$.', math: '2^x \\cdot 2 + 2^x + \\frac{2^x}{2} = 28' },
+                    { text: 'Extraemos $2^x$ como factor común en el primer miembro.', math: '2^x \\left(2 + 1 + \\frac{1}{2}\\right) = 28 \\implies 2^x \\cdot \\frac{7}{2} = 28' },
+                    { text: 'Despejamos $2^x$ multiplicando por $2$ y dividiendo entre $7$.', math: '2^x = \\frac{28 \\cdot 2}{7} = 8' },
+                    { text: 'Igualamos bases ($8 = 2^3$) para obtener la solución.', math: '2^x = 2^3 \\implies x = 3' }
+                ]
+            },
+            {
+                id: 'ex5',
+                level: 'avanzado',
+                levelLabel: 'Avanzado',
+                method: 'Cambio de variable cuadrático',
+                equation: '9^x - 4 \\cdot 3^x + 3 = 0',
+                steps: [
+                    { text: 'Reescribimos $9^x$ como potencia de base $3$: $9^x = (3^2)^x = (3^x)^2$.', math: '(3^x)^2 - 4 \\cdot 3^x + 3 = 0' },
+                    { text: 'Realizamos el cambio de variable $t = 3^x$ (recordando que $t > 0$).', math: 't^2 - 4t + 3 = 0' },
+                    { text: 'Factorizamos o aplicamos la fórmula cuadrática para hallar los valores de $t$.', math: '(t - 3)(t - 1) = 0 \\implies t_1 = 3, \\quad t_2 = 1' },
+                    { text: 'Deshacemos el cambio $3^x = t$ para cada solución válida.', math: '\\text{Si } 3^x = 3 \\implies x_1 = 1 \\quad | \\quad \\text{Si } 3^x = 1 \\implies x_2 = 0' }
+                ]
+            },
+            {
+                id: 'ex6',
+                level: 'avanzado',
+                levelLabel: 'Avanzado',
+                method: 'Cambio de variable con raíz descartada',
+                equation: '4^x + 2^{x+1} - 8 = 0',
+                steps: [
+                    { text: 'Expresamos $4^x = (2^x)^2$ y $2^{x+1} = 2 \\cdot 2^x$.', math: '(2^x)^2 + 2 \\cdot 2^x - 8 = 0' },
+                    { text: 'Sustituimos $t = 2^x$ para obtener una ecuación de segundo grado.', math: 't^2 + 2t - 8 = 0' },
+                    { text: 'Resolvemos para $t$: $(t + 4)(t - 2) = 0$.', math: 't_1 = -4, \\quad t_2 = 2' },
+                    { text: 'Descartamos $t_1 = -4$ porque $2^x > 0$ para todo $x \\in \\mathbb{R}$. Nos quedamos con $t_2 = 2$.', math: '2^x = 2 \\implies x = 1' }
+                ]
+            }
+        ];
+
+        // Estado de pasos revelados por cada ejemplo
+        const exampleState = {};
+        EXAMPLES_DATA.forEach(ex => exampleState[ex.id] = 0);
+
+        function renderExamples(filter = 'todos') {
+            const container = document.getElementById('examples-container');
+            container.innerHTML = '';
+
+            const filtered = filter === 'todos' 
+                ? EXAMPLES_DATA 
+                : EXAMPLES_DATA.filter(ex => ex.level === filter);
+
+            filtered.forEach(ex => {
+                const revealedCount = exampleState[ex.id] || 0;
+                const totalSteps = ex.steps.length;
+
+                let badgeColor = 'bg-emerald-100 text-emerald-800';
+                if (ex.level === 'intermedio') badgeColor = 'bg-amber-100 text-amber-800';
+                if (ex.level === 'avanzado') badgeColor = 'bg-rose-100 text-rose-800';
+
+                let stepsHTML = '';
+                for (let i = 0; i < totalSteps; i++) {
+                    const isVisible = i < revealedCount;
+                    if (isVisible) {
+                        stepsHTML += `
+                            <div class="p-3.5 bg-slate-50 border-l-4 border-brand-500 rounded-r-xl space-y-1.5 transition-all">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-5 h-5 rounded-full bg-brand-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">${i + 1}</span>
+                                    <p class="text-xs sm:text-sm text-slate-700">${ex.steps[i].text}</p>
+                                </div>
+                                <div class="pl-7 text-sm sm:text-base font-semibold text-slate-900 overflow-x-auto">
+                                    $$${ex.steps[i].math}$$
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
+                if (revealedCount === 0) {
+                    stepsHTML = `
+                        <div class="py-6 text-center text-xs text-slate-400 border border-dashed border-slate-200 rounded-xl">
+                            Pulsa "Siguiente paso" para comenzar a desglosar la resolución.
+                        </div>
+                    `;
+                }
+
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between overflow-hidden';
+                card.innerHTML = `
+                    <div>
+                        <div class="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${badgeColor}">${ex.levelLabel}</span>
+                            <span class="text-xs font-medium text-slate-500">${ex.method}</span>
+                        </div>
+                        <div class="p-5 space-y-4">
+                            <div class="text-center py-3 px-4 bg-brand-50/60 rounded-xl border border-brand-100 text-xl sm:text-2xl font-bold text-slate-900 overflow-x-auto">
+                                $$${ex.equation}$$
+                            </div>
+                            <div class="space-y-2.5">
+                                ${stepsHTML}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                        <span class="text-xs font-semibold text-slate-500">Progreso: ${revealedCount} / ${totalSteps} pasos</span>
+                        <div class="flex gap-2">
+                            ${revealedCount > 0 ? `
+                                <button onclick="resetExample('${ex.id}', '${filter}')" class="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg transition">
+                                    Reiniciar
+                                </button>
+                            ` : ''}
+                            ${revealedCount < totalSteps ? `
+                                <button onclick="nextStepExample('${ex.id}', '${filter}')" class="px-3.5 py-1.5 text-xs font-semibold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition flex items-center gap-1">
+                                    Siguiente paso <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <button onclick="showAllExample('${ex.id}', '${filter}')" class="px-3 py-1.5 text-xs font-semibold bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg transition">
+                                    Ver todo
+                                </button>
+                            ` : `
+                                <span class="px-3 py-1.5 text-xs font-bold text-emerald-700 bg-emerald-100 rounded-lg flex items-center gap-1">
+                                    <i data-lucide="check" class="w-3.5 h-3.5"></i> Completado
+                                </span>
+                            `}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            lucide.createIcons();
+            renderMath(container);
+        }
+
+        let currentExampleFilter = 'todos';
+        function filterExamples(level) {
+            currentExampleFilter = level;
+            document.querySelectorAll('.ex-filter-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-900', 'text-white');
+                btn.classList.add('bg-slate-100', 'text-slate-700');
+            });
+            event.target.classList.remove('bg-slate-100', 'text-slate-700');
+            event.target.classList.add('bg-slate-900', 'text-white');
+            renderExamples(level);
+        }
+
+        function nextStepExample(id, filter) {
+            const ex = EXAMPLES_DATA.find(e => e.id === id);
+            if (ex && exampleState[id] < ex.steps.length) {
+                exampleState[id]++;
+                renderExamples(currentExampleFilter);
+            }
+        }
+
+        function showAllExample(id) {
+            const ex = EXAMPLES_DATA.find(e => e.id === id);
+            if (ex) {
+                exampleState[id] = ex.steps.length;
+                renderExamples(currentExampleFilter);
+            }
+        }
+
+        function resetExample(id) {
+            exampleState[id] = 0;
+            renderExamples(currentExampleFilter);
+        }
+
+        // ==========================================
+        // 4. GENERADOR DE PRÁCTICA INTERACTIVA
+        // ==========================================
+        let currentProblem = null;
+        let score = 0;
+        let problemSolved = false;
+
+        function randInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function generateNewProblem() {
+            const level = document.getElementById('practice-level').value;
+            problemSolved = false;
+            
+            // Limpiar UI
+            document.getElementById('user-answer').value = '';
+            document.getElementById('practice-feedback').classList.add('hidden');
+            document.getElementById('practice-solution-box').classList.add('hidden');
+
+            const badge = document.getElementById('prob-badge');
+            const typeLabel = document.getElementById('prob-type');
+
+            if (level === 'basico') {
+                badge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800';
+                badge.textContent = 'Nivel Básico';
+                typeLabel.textContent = 'Igualación de bases';
+
+                const bases = [2, 3, 5];
+                const a = bases[randInt(0, bases.length - 1)];
+                const m = randInt(1, 3);
+                const xSol = randInt(-2, 4);
+                const k = randInt(1, 4); // exponente derecho: a^k
+                // Queremos m*x + n = k => n = k - m*xSol
+                const n = k - m * xSol;
+                const rhs = Math.pow(a, k);
+
+                const mStr = m === 1 ? 'x' : `${m}x`;
+                const nStr = n === 0 ? '' : (n > 0 ? ` + ${n}` : ` - ${Math.abs(n)}`);
+                const eqLatex = `${a}^{${mStr}${nStr}} = ${rhs}`;
+
+                currentProblem = {
+                    equation: eqLatex,
+                    answer: xSol,
+                    steps: [
+                        `Expresamos $${rhs}$ como potencia de base $${a}$: $${rhs} = ${a}^{${k}}$.`,
+                        `Igualamos exponentes: $${mStr}${nStr} = ${k}$.`,
+                        `Despejamos $x$: $${mStr} = ${k - n} \\implies x = ${xSol}$.`
+                    ]
+                };
+
+            } else if (level === 'intermedio') {
+                badge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800';
+                badge.textContent = 'Nivel Intermedio';
+
+                if (Math.random() < 0.5) {
+                    // Tipo A: Logaritmos a^x = b
+                    typeLabel.textContent = 'Uso de logaritmos';
+                    const bases = [2, 3, 5, 7];
+                    const a = bases[randInt(0, bases.length - 1)];
+                    let b = randInt(4, 25);
+                    while (Math.log(b) / Math.log(a) % 1 === 0) b++; // evitar potencia exacta
+
+                    const exactVal = Math.log(b) / Math.log(a);
+                    currentProblem = {
+                        equation: `${a}^x = ${b}`,
+                        answer: exactVal,
+                        steps: [
+                            `Como $${b}$ no es potencia exacta de $${a}$, aplicamos logaritmos: $\\ln(${a}^x) = \\ln(${b})$.`,
+                            `Aplicamos la propiedad de potencia: $x \\cdot \\ln(${a}) = \\ln(${b})$.`,
+                            `Despejamos $x$: $x = \\frac{\\ln(${b})}{\\ln(${a})} \\approx ${exactVal.toFixed(3)}$.`
+                        ]
+                    };
+                } else {
+                    // Tipo B: Factor común a^(x+1) + a^x = c
+                    typeLabel.textContent = 'Factor común de potencias';
+                    const a = [2, 3][randInt(0, 1)];
+                    const xSol = randInt(1, 3);
+                    const rhs = Math.pow(a, xSol) * (a + 1);
+
+                    currentProblem = {
+                        equation: `${a}^{x+1} + ${a}^x = ${rhs}`,
+                        answer: xSol,
+                        steps: [
+                            `Descomponemos $${a}^{x+1} = ${a} \\cdot ${a}^x$: queda $${a} \\cdot ${a}^x + ${a}^x = ${rhs}$.`,
+                            `Sacamos factor común $${a}^x$: $${a}^x(${a} + 1) = ${rhs} \\implies ${a + 1} \\cdot ${a}^x = ${rhs}$.`,
+                            `Dividimos entre $${a + 1}$: $${a}^x = ${Math.pow(a, xSol)} = ${a}^{${xSol}} \\implies x = ${xSol}$.`
+                        ]
+                    };
+                }
+
+            } else {
+                // Nivel Avanzado: Cambio de variable con 1 solución real positiva para t
+                badge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800';
+                badge.textContent = 'Nivel Avanzado';
+                typeLabel.textContent = 'Cambio de variable';
+
+                const a = [2, 3][randInt(0, 1)];
+                const aSq = a * a;
+                const xSol = randInt(0, 2);
+                const t1 = Math.pow(a, xSol); // raíz positiva
+                const t2 = -randInt(1, 4);     // raíz negativa descartable
+
+                // (t - t1)(t - t2) = t^2 - (t1+t2)t + t1*t2 = 0
+                const B = -(t1 + t2);
+                const C = t1 * t2;
+
+                const bTerm = B === 0 ? '' : (B > 0 ? `+ ${B === 1 ? '' : B} \\cdot ${a}^x` : `- ${Math.abs(B) === 1 ? '' : Math.abs(B)} \\cdot ${a}^x`);
+                const cTerm = C > 0 ? `+ ${C}` : `- ${Math.abs(C)}`;
+
+                currentProblem = {
+                    equation: `${aSq}^x ${bTerm} ${cTerm} = 0`,
+                    answer: xSol,
+                    steps: [
+                        `Reescribimos $${aSq}^x = (${a}^x)^2$ y hacemos el cambio $t = ${a}^x$ ($t > 0$).`,
+                        `Obtenemos la cuadrática: $t^2 ${B >= 0 ? '+ ' + B : '- ' + Math.abs(B)}t ${cTerm} = 0$.`,
+                        `Las raíces son $t_1 = ${t1}$ y $t_2 = ${t2}$. Descartamos $t_2 = ${t2}$ por ser negativa.`,
+                        `Deshacemos el cambio con $t_1 = ${t1}$: $${a}^x = ${t1} \\implies x = ${xSol}$.`
+                    ]
+                };
+            }
+
+            const eqEl = document.getElementById('prob-equation');
+            eqEl.innerHTML = `$$${currentProblem.equation}$$`;
+            renderMath(eqEl);
+        }
+
+        // Evaluador seguro de expresiones matemáticas simples ingresadas por el usuario
+        function evaluateUserExpression(input) {
+            let expr = input.trim().toLowerCase().replace(/,/g, '.');
+            if (!expr) return NaN;
+
+            // Permitir ln(x) y log(x)
+            expr = expr.replace(/ln\(/g, 'Math.log(');
+            expr = expr.replace(/log\(/g, 'Math.log10(');
+
+            // Validar que solo contenga caracteres matemáticos seguros
+            if (!/^[0-9+\-*/().\sMathlog10]+$/.test(expr)) {
+                return NaN;
+            }
+
+            try {
+                const val = Function('"use strict";return (' + expr + ')')();
+                return typeof val === 'number' && isFinite(val) ? val : NaN;
+            } catch (e) {
+                return NaN;
+            }
+        }
+
+        function checkAnswer() {
+            const rawInput = document.getElementById('user-answer').value;
+            const feedback = document.getElementById('practice-feedback');
+            const userVal = evaluateUserExpression(rawInput);
+
+            feedback.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'border-emerald-200', 'bg-rose-50', 'text-rose-800', 'border-rose-200', 'bg-amber-50', 'text-amber-800', 'border-amber-200');
+            feedback.classList.add('border');
+
+            if (isNaN(userVal)) {
+                feedback.classList.add('bg-amber-50', 'text-amber-800', 'border-amber-200');
+                feedback.innerHTML = '⚠️ Por favor, introduce un número válido, fracción (ej. <code>3/2</code>) o expresión logarítmica (ej. <code>ln(5)/ln(2)</code>).';
+                return;
+            }
+
+            // Tolerancia de 0.02 para respuestas decimales redondeadas
+            if (Math.abs(userVal - currentProblem.answer) <= 0.02) {
+                feedback.classList.add('bg-emerald-50', 'text-emerald-800', 'border-emerald-200');
+                feedback.innerHTML = `🎉 <strong>¡Excelente!</strong> Tu respuesta ($x \\approx ${userVal.toFixed(3)}$) es correcta.`;
+                
+                if (!problemSolved) {
+                    score++;
+                    problemSolved = true;
+                    document.getElementById('score-counter').textContent = score;
+                }
+            } else {
+                feedback.classList.add('bg-rose-50', 'text-rose-800', 'border-rose-200');
+                feedback.innerHTML = `❌ <strong>No exactamente.</strong> El valor que introdujiste equivale a $${userVal.toFixed(3)}$, pero no satisface la ecuación. Revisa tus signos o despliega la solución paso a paso.`;
+            }
+
+            renderMath(feedback);
+        }
+
+        function togglePracticeSolution() {
+            const box = document.getElementById('practice-solution-box');
+            const list = document.getElementById('practice-steps-list');
+
+            if (box.classList.contains('hidden')) {
+                list.innerHTML = currentProblem.steps.map((step, idx) => `
+                    <div class="flex items-start gap-2.5 bg-white p-3 rounded-lg border border-slate-200">
+                        <span class="w-5 h-5 rounded-full bg-brand-100 text-brand-700 font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">${idx + 1}</span>
+                        <div>${step}</div>
+                    </div>
+                `).join('');
+                box.classList.remove('hidden');
+                renderMath(box);
+            } else {
+                box.classList.add('hidden');
+            }
+        }
+
+        // ==========================================
+        // 5. SOLUCIONADOR Y GRÁFICA HTML5 CANVAS
+        // ==========================================
+        function setSolverPreset(k, a, m, n, c) {
+            document.getElementById('sol-k').value = k;
+            document.getElementById('sol-a').value = a;
+            document.getElementById('sol-m').value = m;
+            document.getElementById('sol-n').value = n;
+            document.getElementById('sol-c').value = c;
+            solveCustomEquation();
+        }
+
+        function solveCustomEquation() {
+            const k = parseFloat(document.getElementById('sol-k').value);
+            const a = parseFloat(document.getElementById('sol-a').value);
+            const m = parseFloat(document.getElementById('sol-m').value);
+            const n = parseFloat(document.getElementById('sol-n').value);
+            const c = parseFloat(document.getElementById('sol-c').value);
+
+            const previewEl = document.getElementById('solver-preview-eq');
+            const stepsEl = document.getElementById('solver-steps');
+
+            if ([k, a, m, n, c].some(isNaN)) {
+                stepsEl.innerHTML = `<p class="text-amber-600 font-medium">Completa todos los campos numéricos para calcular.</p>`;
+                return;
+            }
+
+            // Formatear vista previa en LaTeX
+            const kStr = k === 1 ? '' : (k === -1 ? '-' : `${k} \\cdot `);
+            const mStr = m === 1 ? 'x' : (m === -1 ? '-x' : `${m}x`);
+            const nStr = n === 0 ? '' : (n > 0 ? ` + ${n}` : ` - ${Math.abs(n)}`);
+            const eqLatex = `${kStr}${a}^{${mStr}${nStr}} = ${c}`;
+            previewEl.innerHTML = `$$${eqLatex}$$`;
+            renderMath(previewEl);
+
+            // Validaciones matemáticas
+            if (a <= 0 || a === 1) {
+                stepsEl.innerHTML = `<div class="p-3 bg-rose-50 text-rose-700 rounded-xl border border-rose-200">La base $a$ debe ser estrictamente positiva ($a > 0$) y distinta de $1$.</div>`;
+                renderMath(stepsEl);
+                drawGraph(k, a, m, n, c, null);
+                return;
+            }
+            if (k === 0 || m === 0) {
+                stepsEl.innerHTML = `<div class="p-3 bg-rose-50 text-rose-700 rounded-xl border border-rose-200">Ni el coeficiente $k$ ni la pendiente $m$ pueden ser cero.</div>`;
+                renderMath(stepsEl);
+                drawGraph(k, a, m, n, c, null);
+                return;
+            }
+
+            const ratio = c / k;
+            let stepsHTML = '';
+            let solutionX = null;
+
+            stepsHTML += `
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <span class="text-xs font-bold text-slate-400 uppercase">Paso 1: Aislar la potencia</span>
+                    <p class="mt-1">Dividimos ambos lados entre $k = ${k}$:</p>
+                    <div class="font-semibold text-slate-900 mt-1">$$${a}^{${mStr}${nStr}} = \\frac{${c}}{${k}} = ${Number(ratio.toFixed(4))}$$</div>
+                </div>
+            `;
+
+            if (ratio <= 0) {
+                stepsHTML += `
+                    <div class="p-3.5 bg-rose-50 text-rose-800 rounded-xl border border-rose-200">
+                        <span class="text-xs font-bold uppercase">Sin Solución Real</span>
+                        <p class="mt-1">Como una potencia de base positiva ($${a}^{${mStr}${nStr}}$) siempre es estrictamente mayor que cero, nunca puede igualar a $${Number(ratio.toFixed(4))} \\le 0$.</p>
+                    </div>
+                `;
+            } else {
+                const expVal = Math.log(ratio) / Math.log(a);
+                solutionX = (expVal - n) / m;
+
+                stepsHTML += `
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <span class="text-xs font-bold text-slate-400 uppercase">Paso 2: Aplicar logaritmos</span>
+                        <p class="mt-1">Tomamos logaritmo natural para bajar el exponente:</p>
+                        <div class="font-semibold text-slate-900 mt-1">$$${mStr}${nStr} = \\frac{\\ln(${Number(ratio.toFixed(4))})}{\\ln(${a})} \\approx ${expVal.toFixed(4)}$$</div>
+                    </div>
+                    <div class="p-3.5 bg-emerald-50 text-emerald-900 rounded-xl border border-emerald-200">
+                        <span class="text-xs font-bold text-emerald-700 uppercase">Paso 3: Solución Final</span>
+                        <p class="mt-1">Despejamos la incógnita $x$:</p>
+                        <div class="text-lg font-bold mt-1">$$x = \\frac{${expVal.toFixed(4)} - (${n})}{${m}} \\approx ${solutionX.toFixed(4)}$$</div>
+                    </div>
+                `;
+            }
+
+            stepsEl.innerHTML = stepsHTML;
+            renderMath(stepsEl);
+            drawGraph(k, a, m, n, c, solutionX);
+        }
+
+        // Dibujo responsivo en HTML5 Canvas
+        function drawGraph(k, a, m, n, c, solX) {
+            const canvas = document.getElementById('graph-canvas');
+            if (!canvas) return;
+            const container = canvas.parentElement;
+            
+            // Ajustar resolución Retina / HiDPI
+            const dpr = window.devicePixelRatio || 1;
+            const rect = container.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+
+            const W = rect.width;
+            const H = rect.height;
+            ctx.clearRect(0, 0, W, H);
+
+            // Definir ventana matemática (xMin, xMax, yMin, yMax)
+            const centerX = (solX !== null && isFinite(solX)) ? solX : 0;
+            const spanX = 8;
+            const xMin = centerX - spanX;
+            const xMax = centerX + spanX;
+
+            const refY = isFinite(c) ? c : 0;
+            const spanY = Math.max(8, Math.abs(refY) * 1.6);
+            const yMin = Math.min(-2, refY - spanY * 0.5);
+            const yMax = Math.max(10, refY + spanY * 0.7);
+
+            const toPxX = x => ((x - xMin) / (xMax - xMin)) * W;
+            const toPxY = y => H - ((y - yMin) / (yMax - yMin)) * H;
+
+            // 1. Cuadrícula de fondo
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 1;
+            const stepX = Math.max(1, Math.round((xMax - xMin) / 10));
+            for (let x = Math.ceil(xMin); x <= Math.floor(xMax); x += stepX) {
+                const px = toPxX(x);
+                ctx.beginPath();
+                ctx.moveTo(px, 0);
+                ctx.lineTo(px, H);
+                ctx.stroke();
+            }
+
+            const stepY = Math.max(1, Math.round((yMax - yMin) / 8));
+            for (let y = Math.ceil(yMin); y <= Math.floor(yMax); y += stepY) {
+                const py = toPxY(y);
+                ctx.beginPath();
+                ctx.moveTo(0, py);
+                ctx.lineTo(W, py);
+                ctx.stroke();
+            }
+
+            // 2. Ejes X e Y
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 1.5;
+            const zeroX = toPxX(0);
+            const zeroY = toPxY(0);
+
+            if (zeroY >= 0 && zeroY <= H) {
+                ctx.beginPath();
+                ctx.moveTo(0, zeroY);
+                ctx.lineTo(W, zeroY);
+                ctx.stroke();
+            }
+            if (zeroX >= 0 && zeroX <= W) {
+                ctx.beginPath();
+                ctx.moveTo(zeroX, 0);
+                ctx.lineTo(zeroX, H);
+                ctx.stroke();
+            }
+
+            // Etiquetas numéricas en ejes
+            ctx.fillStyle = '#64748b';
+            ctx.font = '11px JetBrains Mono, monospace';
+            for (let x = Math.ceil(xMin); x <= Math.floor(xMax); x += stepX) {
+                if (x === 0) continue;
+                const px = toPxX(x);
+                const labelY = Math.min(Math.max(zeroY + 14, 14), H - 6);
+                ctx.fillText(x.toString(), px - 6, labelY);
+            }
+
+            if (a <= 0 || a === 1 || isNaN(k)) return;
+
+            // 3. Dibujar recta constante g(x) = c
+            const pyC = toPxY(c);
+            ctx.strokeStyle = '#f43f5e';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([6, 4]);
+            ctx.beginPath();
+            ctx.moveTo(0, pyC);
+            ctx.lineTo(W, pyC);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // 4. Dibujar curva exponencial f(x) = k * a^(m*x + n)
+            ctx.strokeStyle = '#4f46e5';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            let started = false;
+            const samples = 300;
+            for (let i = 0; i <= samples; i++) {
+                const x = xMin + (i / samples) * (xMax - xMin);
+                const y = k * Math.pow(a, m * x + n);
+                if (!isFinite(y)) continue;
+                const px = toPxX(x);
+                const py = toPxY(y);
+                if (py >= -200 && py <= H + 200) {
+                    if (!started) {
+                        ctx.moveTo(px, py);
+                        started = true;
+                    } else {
+                        ctx.lineTo(px, py);
+                    }
+                }
+            }
+            ctx.stroke();
+
+            // 5. Punto de intersección (si existe solución real)
+            if (solX !== null && isFinite(solX)) {
+                const ix = toPxX(solX);
+                const iy = toPxY(c);
+
+                // Línea punteada vertical hacia el eje X
+                ctx.strokeStyle = '#10b981';
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([4, 4]);
+                ctx.beginPath();
+                ctx.moveTo(ix, iy);
+                ctx.lineTo(ix, zeroY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Punto destacado
+                ctx.fillStyle = '#10b981';
+                ctx.beginPath();
+                ctx.arc(ix, iy, 6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Etiqueta flotante con coordenadas
+                const tag = `(${solX.toFixed(2)}, ${c})`;
+                ctx.font = 'bold 12px Inter, sans-serif';
+                const textW = ctx.measureText(tag).width;
+                const boxX = Math.min(Math.max(ix + 10, 8), W - textW - 20);
+                const boxY = Math.max(iy - 28, 12);
+
+                ctx.fillStyle = '#0f172a';
+                ctx.beginPath();
+                ctx.roundRect(boxX, boxY, textW + 14, 22, 6);
+                ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.fillText(tag, boxX + 7, boxY + 15);
+            }
+        }
+
+        // Redibujar gráfica al redimensionar pantalla
+        window.addEventListener('resize', () => {
+            if (!document.getElementById('sec-solucionador').classList.contains('hidden')) {
+                solveCustomEquation();
+            }
+        });
+
+        // Inicialización al cargar la página
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            renderExamples('todos');
+            generateNewProblem();
+            setTimeout(() => renderMath(document.body), 150);
+        });
+    </script>
+</body>
+</html>
